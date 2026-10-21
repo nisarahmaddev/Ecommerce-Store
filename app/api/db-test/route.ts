@@ -1,22 +1,21 @@
-
-import { getPool } from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const pool = await getPool();
+    const db = await getDb();
 
-    const result = await pool.request().query(`
-      SELECT
-        DB_NAME() AS databaseName,
-        GETDATE() AS serverTime
-    `);
+    // Test the connection by running a ping command
+    const result = await db.admin().ping();
+    const dbName = db.databaseName;
 
     return Response.json({
       success: true,
-      message: "SQL Server connected successfully",
-      ...result.recordset[0],
+      message: "MongoDB connected successfully",
+      database: dbName,
+      serverTime: new Date().toISOString(),
+      ping: result,
     });
   } catch (error) {
     console.error("Database connection failed:", error);
@@ -24,7 +23,10 @@ export async function GET() {
     return Response.json(
       {
         success: false,
-        message: "Database connection failed. Check server settings and credentials.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unknown database connection error",
       },
       { status: 500 }
     );

@@ -1,15 +1,18 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, Heart, Share2 } from 'lucide-react';
-import { products } from '@/lib/data/products';
+import { getAllProductSlugs, getProductBySlug } from '@/lib/data/products-db';
+import { ProductClient } from './ProductClient';
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+export async function generateStaticParams() {
+  const slugs = await getAllProductSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const product = products.find((p) => p.slug === params.slug);
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+  
   if (!product) notFound();
 
   return (
@@ -47,41 +50,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             <p className="text-gray-700 leading-relaxed">{product.description}</p>
           </div>
 
-          {product.sizes && (
-            <div className="space-y-3">
-              <label className="text-gray-900 text-sm tracking-wide">Size</label>
-              <div className="flex gap-2">
-                {product.sizes.map((size) => (
-                  <button key={size} className="flex-1 py-3 text-sm tracking-wide border border-gray-200 hover:border-gray-900">
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-3">
-            <label className="text-gray-900 text-sm tracking-wide">Quantity</label>
-            <div className="flex items-center border border-gray-200 w-32">
-              <button className="p-3 hover:bg-gray-50"><Minus className="w-4 h-4" /></button>
-              <span className="flex-1 text-center">1</span>
-              <button className="p-3 hover:bg-gray-50"><Plus className="w-4 h-4" /></button>
-            </div>
-          </div>
-
-          <div className="space-y-3 pt-4">
-            <button className="w-full py-4 bg-gray-900 text-white tracking-wide hover:bg-gray-800">Add to Cart</button>
-            <div className="flex gap-3">
-              <button className="flex-1 py-3 border border-gray-200 hover:border-gray-900 flex items-center justify-center gap-2">
-                <Heart className="w-4 h-4" />
-                <span className="text-sm">Save</span>
-              </button>
-              <button className="flex-1 py-3 border border-gray-200 hover:border-gray-900 flex items-center justify-center gap-2">
-                <Share2 className="w-4 h-4" />
-                <span className="text-sm">Share</span>
-              </button>
-            </div>
-          </div>
+          <ProductClient product={product} />
 
           <div className="pt-6 space-y-2 text-sm text-gray-600">
             <p>✓ Free shipping on orders over $75</p>

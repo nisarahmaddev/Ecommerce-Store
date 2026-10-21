@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { Menu, Search, User, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
+import { useCart } from '@/lib/context/CartContext';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { totalItems } = useCart();
 
   return (
     <header className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100'>
@@ -25,10 +27,14 @@ export function Header() {
           <div className='flex items-center gap-4 md:gap-6'>
             <button className='text-gray-900 hover:text-gray-600 transition-colors'><Search className='w-5 h-5' /></button>
             <button className='text-gray-900 hover:text-gray-600 transition-colors'><User className='w-5 h-5' /></button>
-            <button className='text-gray-900 hover:text-gray-600 transition-colors relative'>
+            <Link href='/cart' className='text-gray-900 hover:text-gray-600 transition-colors relative'>
               <ShoppingBag className='w-5 h-5' />
-              <span className='absolute -top-2 -right-2 w-5 h-5 bg-gray-900 text-white text-xs rounded-full flex items-center justify-center'>2</span>
-            </button>
+              {totalItems > 0 && (
+                <span className='absolute -top-2 -right-2 w-5 h-5 bg-gray-900 text-white text-xs rounded-full flex items-center justify-center'>
+                  {totalItems}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </div>

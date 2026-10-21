@@ -7,7 +7,12 @@
         "lint": "next lint",
         "build": "next build",
         "dev": "next dev",
-        "start": "next start"
+        "start": "next start",
+        "seed": "tsx scripts/seed.ts",
+        "test-api": "tsx scripts/test-api.ts",
+        "test-orders": "tsx scripts/test-orders.ts",
+        "cleanup-test-orders": "tsx scripts/cleanup-test-orders.ts",
+        "verify-storefront": "tsx scripts/verify-storefront.ts"
     },
     "repository": {
         "type": "git",
@@ -27,7 +32,7 @@
         "@types/react-dom": "^19.3.0",
         "clsx": "^2.1.1",
         "lucide-react": "^1.52.0",
-        "mssql": "^12.7.9",
+        "mongodb": "^7.7.0",
         "next": "^16.4.0",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",
@@ -35,9 +40,9 @@
         "typescript": "^7.0.2"
     },
     "devDependencies": {
-        "@types/mssql": "^12.3.0",
         "autoprefixer": "^10.4.17",
         "postcss": "^8.4.35",
-        "tailwindcss": "^3.4.1"
+        "tailwindcss": "^3.4.1",
+        "tsx": "^4.23.15"
     }
 }

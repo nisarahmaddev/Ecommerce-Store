@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { CartProvider } from '@/lib/context/CartContext';
 
 export const metadata: Metadata = {
   title: 'LŪMEN - Essentials for Intentional Living',
@@ -12,9 +13,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen bg-white">
-        <Header />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Header />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

@@ -1,38 +1,34 @@
+import { MongoClient, Db } from "mongodb";
 
-import sql from "mssql";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/lumen_store";
+const DB_NAME = "lumen_store";
 
-const config: sql.config = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER || "localhost",
-  database: process.env.DB_NAME || "EcommerceDB",
+let cachedClient: MongoClient | null = null;
+let cachedDb: Db | null = null;
 
-  options: {
-    instanceName: process.env.DB_INSTANCE || "SQLEXPRESS",
-    encrypt: true,
-    trustServerCertificate: true,
-  },
-
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000,
-  },
-};
-
-let poolPromise: Promise<sql.ConnectionPool> | null = null;
-
-export async function getPool(): Promise<sql.ConnectionPool> {
-  if (!poolPromise) {
-    poolPromise = new sql.ConnectionPool(config)
-      .connect()
-      .catch((error) => {
-        poolPromise = null;
-        throw error;
-      });
+export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
   }
 
-  return poolPromise;
+  const client = await MongoClient.connect(MONGODB_URI);
+  const db = client.db(DB_NAME);
+
+  cachedClient = client;
+  cachedDb = db;
+
+  return { client, db };
 }
 
-export { sql };
+export async function getDb(): Promise<Db> {
+  const { db } = await connectToDatabase();
+  return db;
+}
+
+export async function closeDatabaseConnection(): Promise<void> {
+  if (cachedClient) {
+    await cachedClient.close();
+    cachedClient = null;
+    cachedDb = null;
+  }
+}

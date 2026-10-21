@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Leaf, Award, PackageCheck } from 'lucide-react';
-import { products } from '@/lib/data/products';
+import { getFeaturedProducts } from '@/lib/data/products-db';
 import { ProductCard } from '@/components/products/ProductCard';
 
-export default function HomePage() {
-  const featuredProducts = products.filter(p => p.featured).slice(0, 6);
+export default async function HomePage() {
+  const featuredProducts = await getFeaturedProducts(6);
   
   return (
     <div className="min-h-screen">
